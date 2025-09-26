@@ -4,11 +4,13 @@ Termianl with AI integration,
 you can just stop your AI
 OR Told something to AI
 
+<details>
+<summary><h2 style="display: inline;"> Way of using it?</h2></summary>
 
-## Way of using it?
+
 I am confuse in three ways#one in abstraction of both
 
-> To invoke our AI/Program, we will use `PO` keyword
+> To invoke our AI/Program, we will use `PO` keyword (can be changed, but for now we go for it)
 
 ### 1. Loop-Based
 
@@ -101,7 +103,14 @@ Why not Auto?
 1. Expensive. 
 2. Still needed to invoke our Program and use it as terminal(why just don't write "PO" prefix?)
 
+</details>
 
+---
 
+<details>
+<summary><h2 style="display: inline;">Ideas/Features</h2></summary>
+
+### Daniyal Haider:
 Jo ke apki troubleshoot me help karega like hamare server per application ke ya services ke bht sare logs hote he means agar apke server per microservices chal rahi ho to apke pas bht sare logs hote he us me manually apko koi cheez investigate karna thora mushkil hota he to hum isko agar automate karde to ye blkl real world or helpfull project ho jaiga.
 
+</details>
