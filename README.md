@@ -114,3 +114,75 @@ Why not Auto?
 Jo ke apki troubleshoot me help karega like hamare server per application ke ya services ke bht sare logs hote he means agar apke server per microservices chal rahi ho to apke pas bht sare logs hote he us me manually apko koi cheez investigate karna thora mushkil hota he to hum isko agar automate karde to ye blkl real world or helpfull project ho jaiga.
 
 </details>
+
+
+<details>
+<summary><h2 style="display: inline;">Code Flow</h2></summary>
+
+- Our project will be in Python
+- **"Bring Your Own Keys"**.
+- We are going with Loop-Based system.
+
+We will write Modular code
+- AI Module
+    - Input to AI
+    - Output from AI
+    - Manage the Context Window. How?
+        - Object level? like obj.add_memory(ai_and_user_talk)
+
+- Terminal/Window Module
+    - Start/Invoke the Program. 
+        - Maybe adding the word to Path? 
+        - installing as Global util? -> `pipx install PO`
+    - /ai for Invoking the AI (Loop started)
+        - Start: Query to AI
+        - AI responded
+        - ?Continue to talk with AI
+        - Exit
+
+
+        ```bash
+        $ PO "can you push it" # AI got invoked, keep context of talk
+        $ AI: Here is cmd for push to remote origin main
+            $ git push origin main
+            Press y to execute it, n for exit this prompt-loop, or wirte your query: 
+        $ No I do not want to push on origin, what are my remotes?
+        $ AI: Oh, I get it, to see your remote, here its cmd
+            $ git remote -v
+            Press y to execute it, n for exit this prompt-loop, or wirte your query: 
+        $ y
+        $ git remote -v  # pasted by program
+        $ origin  https://github.com/<usrename>/<repo-name>.git (fetch)
+        $ origin  https://github.com/<usrename>/<repo-name>.git (push)
+        $ # Below step may be implemented
+        $ AI: Now what I need to do?
+            Press y to execute it, n for exit this prompt-loop, or wirte your query: 
+        $ n # AI exited, all loop context gone
+        ```
+
+    - exit
+
+Lang Chain
+Lang Graph
+Custom Code?
+
+
+
+</details>
+
+
+```mermaid
+flowchart
+A["Use AI powered Terminal(PO)"]
+A ---> B["/ai to invoke AI<br/>Give your query"]
+B ---> C["AI responded"]
+C ---> D{"Continue to talk"}
+D ---> |"YES"| C
+D ---> |"NO"| A
+A ---> G["Normal commands<br/>`git status`"]
+G ---> A
+```
+
+
+
+
