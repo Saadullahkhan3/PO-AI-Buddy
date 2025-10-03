@@ -1,1 +1,17 @@
+# IDEs
 .vscode/
+tempCodeRunnerFile.py
+
+
+# Environment files
+.env.local
+
+
+# Virtual environment
+.venv/
+testenv
+
+# Python
+*__pycache__/
+*.egg-info/
+build/
