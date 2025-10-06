@@ -1,6 +1,7 @@
 from typing import List, Dict, Optional
 import json 
 import os
+from instructor.core.exceptions import ConfigurationError
 '''
 Able to 
 Start a session
@@ -24,14 +25,7 @@ Give to AI          |
 
 '''
 
-'''
 
-Make sure to give valid JSON obj if 
-{
-    "output": "<your-output-here>"
-    "cmd": ""
-}
-'''
 import instructor
 from pydantic import BaseModel
 
@@ -40,37 +34,10 @@ from pydantic import BaseModel
 class AIResponse(BaseModel):
     """Pydantic model for the AI's JSON response."""
     output: str
-    cmd: str
+    cmd: str | None
 
     def __str__(self):
         return f"Output: {self.output} \n CMD: {self.cmd}"
-
-PROVIDER_WITH_KEYS = [
-    {
-        "provider": "openai/gpt-4",
-        "key": "",
-    },
-    {
-        "provider": "anthropic/claude-3",
-        "key": "",
-    },
-    {
-        "provider": "google/gemini-pro",
-        "key": "",
-    },
-    {
-        "provider": "ollama/llama3",
-        "key": "",
-    },
-    {
-        "provider": "deepseek/deepseek-chat",
-        "key": "",
-    },
-    {
-        "provider": "groq/llama-3.1-8b-instant",
-        "key": "",
-    },
-]
 
 
 CMD = [
@@ -83,33 +50,27 @@ CMD = [
 
 class AI:
     def __init__(self):
-        self.context_memory: List[Dict[str, str]] =[]
+        self.context_memory: List[Dict[str, str]] = []
 
-    def get_prompt(self, query):
+    def get_prompt(self):
         return f"""
 ROLE:
-You are a helpful terminal assistant. You can understand every commands.
-You always answer very briefly and to the point.
+You are a helpful terminal/dev assistant. You can understand every commands. You always answer very briefly and to the point.
 
 INPUT:
-{self.get_context_history()}
-Current input: {query}
-
+{self.get_context_history(mark_current_input=True)}
 
 OUTPUT FORMAT:
 You ALWAYS give output in JSON format following this format:
-{
+{{
     "output": "<your-output-here>",
-    "cmd": "<command-to-execute-if-any>"
-}
-output: Should be a brief description of what you understood from the query.
-cmd: If user have asked about a command, write it there or leave it empty.
+    "cmd": "<command-to-execute-only-if-any>"
+}}
+output: Should be a brief answer for user question. 
+cmd: If user have asked for a command then write it there or write null.
 """
 
     def create_client(self, provider: str, api_key: str | None = None):
-        # if not provider in [p["provider"] for p in PROVIDER_WITH_KEYS]:
-        #     raise ValueError(f"Provider {provider} not supported")
-        
         """Creates an instructor client for the given provider."""
         try:
             # If an API key is provided, use it. Otherwise, instructor will
@@ -118,14 +79,16 @@ cmd: If user have asked about a command, write it there or leave it empty.
                 return instructor.from_provider(provider, api_key=api_key)
             else:
                 return instructor.from_provider(provider)
-        except (ValueError, ImportError) as e:
-            print(f"Failed to create client for '{provider}': {e}")
-            exit(1)
-            # raise  # Re-raise the exception to be handled by the caller
+        except (ValueError, ImportError, ConfigurationError) as e:
+            raise
 
 
     def start_context(self) -> None:
         """Start a new context session"""
+        self.context_memory = []
+
+    def reset_context(self) -> None:
+        """Reset exisiting context session"""
         self.context_memory = []
 
     def end_context(self) -> None:
@@ -140,41 +103,39 @@ cmd: If user have asked about a command, write it there or leave it empty.
         })
 
 
-    def get_context_history(self) -> str:
+    def get_context_history(self, mark_current_input: bool = False) -> str:
         """Get formatted context history"""
         if not self.context_memory:
             return ""
         
         history = []
-        for msg in self.context_memory:
-            history.append(f"{msg['origin']}: {msg['content']}")
+        last = len(self.context_memory) - 1
+        for i, msg in enumerate(self.context_memory):
+            if mark_current_input and i < last:
+                history.append(f"{msg['origin']}: {msg['content']}")
+            history.append(f"Current Input({msg['origin']}): {msg['content']}")
         return "\n".join(history)
 
 
     def process_input(self, client, query: str) -> AIResponse:
-        """Process user query and return response"""
-        
+        """Process user query and return response"""        
         self.add_to_context("Human", query)
-
-        response: AIResponse = self.generate_response(client, query)
-        
+        response = self.generate_response(client)
+        print("<<<< AI RESPONSE ", response)
         self.add_to_context("AI", str(response))
-           
         return response
 
 
-    def generate_response(self, client, query: str) -> str:
+    def generate_response(self, client) -> str:
         """Generate AI response based on query and context"""
-
         # for cmd in CMD:
         #     cmd_key = list(cmd.keys())[0]
         #     if cmd_key in query.lower:
         #         return f"Command: {cmd[cmd_key]}"
-        print("++++++++++++   PROMPT -> ", self.get_prompt(query))
+        print("++++++++++++   PROMPT -> ", self.get_prompt())
         ai_output_obj = client.chat.completions.create(
             response_model=AIResponse,
-            messages=[{"role": "user", "content": self.get_prompt(query)}],
-            # stream=True,
+            messages=[{"role": "user", "content": self.get_prompt()}],
         )
         return ai_output_obj
 

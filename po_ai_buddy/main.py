@@ -1,7 +1,10 @@
 import argparse
-import sys
+
+from po_ai_buddy.ai import AI
 from .config import Config
 from .terminal import SmartTerminal
+
+
 
 def handle_config_command(args, config):
     """Handle --config subcommands"""
@@ -51,13 +54,12 @@ def create_parser():
     
     return parser
 
+
 def main():
     config = Config()
+    ai = AI()
     from pprint import pprint
     pprint(config.__dict__)
-    print(f"Config loaded from: {config.config_path}")
-    print(f"Is project config: {config.is_project_config()}")
-    print(f"Is global config: {config.is_global_config()}")
     parser = create_parser()
     args = parser.parse_args()
     
@@ -72,8 +74,9 @@ def main():
         print(f"Processing query: {query}")
         return
     
-    with SmartTerminal(config) as smart:
+    with SmartTerminal(config, ai) as smart:
         smart.repl()
+
 
 
 if __name__ == "__main__":
