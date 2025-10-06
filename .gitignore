@@ -15,3 +15,8 @@ testenv
 *__pycache__/
 *.egg-info/
 build/
+dist/
+.pypirc
+
+# My files
+txt.txt

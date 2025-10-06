@@ -4,62 +4,59 @@ Termianl with AI integration,
 you can just stop your AI
 OR Told something to AI
 
-<details>
-<summary><h2 style="display: inline;"> Way of using it?</h2></summary>
 
 
-I am confuse in three ways#one in abstraction of both
 
-> To invoke our AI/Program, we will use `PO` keyword (can be changed, but for now we go for it)
+Config File path:
 
-### 1. Loop-Based
+config file also contains the API key.
 
-User will invoke our program and use it as terminal
-if user want to invoke AI, can say like
+CONFIG_FILE_NAME = ".po.json"
 
-```bash
-$ PO #Invoke our program
-$ echo Hello #normal cmd, no AI invoke "PO"
-$ PO "Can you give me git cmd to push tags" #AI takes it, valid cmd -> No, so AI will process it, Invoked the AI via "PO"
-$ exit #exit the program
-```
+Global level config(default):
 
-### 2. Invoke Based
-User will use normal terminal#like cmd
-but for using AI, can directly invoke AI when needed
-like
+### Windows
+`Path.home() / "AppData" / "Roaming" / "po" `
 
-```bash
-$ echo Hello #normal cmd
-$ PO "<your-AI-query>" #only invoke AI when needed
-```
+### Linux/macOS
+`Path.home() / ".config" / "po"`
 
 
-### 3. Intelligent - Auto
+> To invoke our AI/Program, use `PO` keyword
+
+### How it works?
+
+When user invoke our Program via `PO` this will start a REPL with context memory that will be discarded when user want.
     
-Implicit, user will invoke our program as terminal just like in Loop-Based
-but instead of explicitly calling AI#still can user just direct write 
-query or cmd.
-AI will detect that if it is valid cmd, just execute it
-if not, AI will process it.
-
-```bash
-$ PO #Invoke our program
-$ echo Hello #AI takes it, valid cmd -> Yes, just execute it
-$ Can you give me git cmd to push tags #AI takes it, valid cmd -> No, so AI will process it
-$ exit #exit the program
-```
-
-| Type | Explicit | Summary |
-|---|---|---|
-| Loop Based | Yes | Call AI when needed but with-in our Terminal |
-| Invoke Based | Yes | Call AI when needed but from anywhere | 
-| Intelligent | No | AI will decide what to do |
-
 
 Notes: 
 1. Before executing the cmd, program will show the cmd and ask for permission
 2. AI will/can/may be in loop when **prompted**, this mean if AI is processing something, it will keep it in its context until not completed. Like:
+```bash
+$ PO "can you push it" # AI got invoked, keep context of talk
+$ AI: Here is cmd for push to remote origin main
+    $ git push origin main
+    Press y to execute it, n for exit this prompt-loop, or wirte your query: 
+$ No I do not want to push on origin, what are my remotes?
+$ AI: Oh, I get it, to see your remote, here its cmd
+    $ git remote -v
+    Press y to execute it, n for exit this prompt-loop, or wirte your query: 
+$ y
+$ git remote -v  # pasted by program
+$ origin  https://github.com/<usrename>/<repo-name>.git (fetch)
+$ origin  https://github.com/<usrename>/<repo-name>.git (push)
+$ # Below step may be implemented
+$ AI: Now what I need to do?
+    Press y to execute it, n for exit this prompt-loop, or wirte your query: 
+$ n # AI exited, all loop context gone
+```
+
+
+---
+
+
+## Example:
+
     ```bash
     $ PO "can you push it" # AI got invoked, keep context of talk
     $ AI: Here is cmd for push to remote origin main
@@ -79,96 +76,13 @@ Notes:
     $ n # AI exited, all loop context gone
     ```
 
-
-## Questions 
-
-Q1: Can Python Interfere in an Already Opened Terminal? (for 2, Invoke Based system)
-- Directly injecting commands into another running terminal = very hacky (you’d need pseudo-terminal injection, OS signals, etc.).
-
-Q2: Python gives you two solid choices:
-- subprocess.run([...], capture_output=True) → capture stdout/stderr, then print it back.
-Or pty module → gives more realistic shell behavior, but more complex.
-
-
-## Summary
-1st Loop-based program wins, for these reasons.
-1. Easy to implement(context memory, showing the commad)
-
-
-Why not Invoke-based?
-1. Executing a cmd in a existing terminal via Python is not a easy task
-2. Difficult to maintain context memory, actually eventually mini loop-based system
-
-Why not Auto?
-1. Expensive. 
-2. Still needed to invoke our Program and use it as terminal(why just don't write "PO" prefix?)
-
-</details>
-
----
-
-<details>
-<summary><h2 style="display: inline;">Ideas/Features</h2></summary>
-
-### Daniyal Haider:
-Jo ke apki troubleshoot me help karega like hamare server per application ke ya services ke bht sare logs hote he means agar apke server per microservices chal rahi ho to apke pas bht sare logs hote he us me manually apko koi cheez investigate karna thora mushkil hota he to hum isko agar automate karde to ye blkl real world or helpfull project ho jaiga.
-
-</details>
-
-
-<details>
-<summary><h2 style="display: inline;">Code Flow</h2></summary>
-
-- Our project will be in Python
-- **"Bring Your Own Keys"**.
-- We are going with Loop-Based system.
-
-We will write Modular code
-- AI Module
-    - Input to AI
-    - Output from AI
-    - Manage the Context Window. How?
-        - Object level? like obj.add_memory(ai_and_user_talk)
-
-- Terminal/Window Module
-    - Start/Invoke the Program. 
-        - Maybe adding the word to Path? 
-        - installing as Global util? -> `pipx install PO`
-    - /ai for Invoking the AI (Loop started)
-        - Start: Query to AI
-        - AI responded
-        - ?Continue to talk with AI
-        - Exit
-
-
-        ```bash
-        $ PO "can you push it" # AI got invoked, keep context of talk
-        $ AI: Here is cmd for push to remote origin main
-            $ git push origin main
-            Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-        $ No I do not want to push on origin, what are my remotes?
-        $ AI: Oh, I get it, to see your remote, here its cmd
-            $ git remote -v
-            Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-        $ y
-        $ git remote -v  # pasted by program
-        $ origin  https://github.com/<usrename>/<repo-name>.git (fetch)
-        $ origin  https://github.com/<usrename>/<repo-name>.git (push)
-        $ # Below step may be implemented
-        $ AI: Now what I need to do?
-            Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-        $ n # AI exited, all loop context gone
-        ```
-
     - exit
 
-Lang Chain
-Lang Graph
-Custom Code?
 
 
+Instrutor
 
-</details>
+https://platform.deepseek.com/
 
 
 ```mermaid
@@ -185,4 +99,19 @@ G ---> A
 
 
 
+Environment Variables for API Keys:
+Linux/MacOS:
+```bash
+export API_KEY_NAME=<your-api-key-here>
+```
+
+Windows:
+```bash
+setx DEEPSEEK_API_KEY "your-api-key-here"
+```
+
+Variables Names:
+- DEEPSEEK_API_KEY
+- TOGETHER_API_KEY
+- GROQ_API_KEY
 

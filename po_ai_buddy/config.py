@@ -15,6 +15,43 @@ File format:
 }
 '''
 
+DEFAULT_CONFIG = {
+    # "is_ai_identifier": True,
+    # "ai_identifier": "@ai",
+    # "is_context_active": True,
+    "indicator": "$",
+    "models": [
+        {
+            "alias": "gpt5",
+            "provider": "openai/gpt-4"
+        },
+        {
+            "alias": "gini",
+            "provider": "google/gemini-pro"
+        },
+        {
+            "alias": "meta",
+            "provider": "meta"
+        },
+        {
+            "alias": "ant",
+            "provider": "anthropic/claude-3"
+        },
+        {
+            "alias": "o",
+            "provider": "ollama/llama3"
+        },
+        {
+            "alias": "deep",
+            "provider": "deepseek/deepseek-chat"
+        },
+        {
+            "alias": "groq",
+            "provider": "groq/llama-3.1-8b-instant"
+        },
+    ],
+    "default_model": "gpt5"
+}
 
 '''
 Extract all required env vars in config obj -> config.env_x_var
@@ -40,6 +77,7 @@ class Config:
             return Path.home() / ".config" / "po"
     
     def get_config_path(self):
+        # return None
         """Find config file: pwd first, then global, return None if not found"""
         # Check current directory first
         pwd_config = Path.cwd() / self.CONFIG_FILE_NAME
@@ -64,7 +102,10 @@ class Config:
             except (json.JSONDecodeError, IOError) as e:
                 raise ValueError(f"Error loading config from {self.config_path}: {e}")
         else:
-            # No config found, create default global config
+            print("No config found, do you want to create a global level config?")
+            confirm = input("(y/n): ").lower().strip()
+            if not confirm == "y":
+                raise FileNotFoundError("Config file not found. Exiting.")
             self.create_default_global_config()
     
     def create_default_global_config(self):
@@ -75,12 +116,7 @@ class Config:
         self.config_path = global_config_dir / self.CONFIG_FILE_NAME
         
         # Default configuration
-        self.config_data = {
-            "AI_IDENTIFIER": "/ai",
-            "allow_context": True,
-            "INDICATOR": "$"
-        }
-        
+        self.config_data = DEFAULT_CONFIG
         self.save_config()
     
     def save_config(self):
@@ -105,6 +141,19 @@ class Config:
     def is_global_config(self):
         """Check if current config is global"""
         return self.config_path and self.config_path.parent == self.get_global_config_dir()
+    
+    def alias_exists(self, alias: str) -> bool:
+        """Check if a model alias exists in the config."""
+        models = self.get("models", [])
+        return any(model.get("alias") == alias for model in models)
+
+    def provider_for_alias(self, alias: str) -> bool | None:
+        """Check if a provider is defined for a given model alias."""
+        models = self.get("models", [])
+        for model in models:
+            if model.get("alias") == alias:
+                return model.get("provider") if len(model.get("provider")) > 0 else None
+        return None
 
 # Usage example:
 # if __name__ == "__main__":
