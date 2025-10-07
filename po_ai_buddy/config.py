@@ -69,7 +69,7 @@ class Config:
     
 
     def get_config_path(self):
-        return None
+        # return None
         """Find config file: pwd first, then global, return None if not found"""
         # Check current directory first
         pwd_config = Path.cwd() / Config.CONFIG_FILE_NAME
