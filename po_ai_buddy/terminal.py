@@ -100,7 +100,6 @@ class SmartTerminal(Terminal):
                     print(f"Provider '{self.provider}' might be wrong configured/un-supported.\nSee below")
                     print(e)
 
-
             else:   
                 self.run_cmd(user_input)
 

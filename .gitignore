@@ -21,3 +21,5 @@ dist/
 # My files
 txt.txt
 test.py 
+
+.po.json

@@ -1,10 +1,15 @@
-# Introducting the 'PO'
+# Introducing the 'PO'
 
 `PO`, the **AI Integrated Terminal**, no more juggling with different windows, just mention different model with your very own alias. We let you to manage your own context.
 
+## Installation
+```bash
+pip install -i https://test.pypi.org/simple/ po-ai-buddy
+po --version  # if installation is correct, should give version like 1.1.1
+```
 
 ## Bring Your Own Keys!
-You need to give your own keys as environmnet variables. See <a href="env-var">Environment variables</a>
+You need to give your own keys as environmnet variables. See <a href="#env-var">Environment variables</a>
 
 ## Configuration
 - **Configuration file:** Contains the alias for specified models, default model, indicator(e.g _$_)
@@ -66,10 +71,19 @@ $ q     # quit
 Thanks for Using :)
 ```
 
-
-### Example:
+### Multiple-Model without losing context
+> Note: I know this example is slightly weird
 ```bash
-<example-here>
+PO
+$ @bro How to merge two branches?
+groq/llama-3.3-70b-versatile    # DEBUG: Model choosed
+AI: To merge two branches, you can use the 'git merge' command. First, check out the branch you want to merge into, then use 'git merge <branch-name>' to merge the other branch into it. For example: git checkout main && git merge feature/new-feature
+    CMD: git checkout main && git merge feature/new-feature
+Run[y] abort[n] [type more]: @bhai What is your name?
+groq/llama-3.1-8b-instant     # DEBUG: Changed the model, but context maintained
+AI: I am an AI assistant, I don\'t have a personal name, but I can help you with any questions or tasks you have.
+abort[n] [type more]: n
+$
 ```
 
 ---
@@ -92,9 +106,42 @@ Windows:
 setx API_KEY_NAME "your-api-key-here"
 ```
 
-Variables Names:
-- GROQ_API_KEY
-- OPENAI_API_KEY
-- DEEPSEEK_API_KEY
-- TOGETHER_API_KEY
+### API KEYS
+
+
+You need to provider API keys as environment variables. Below you can the corresponding variable name.
+
+> Note: Not full list.
+
+_Make sure that your selected model support 'tooling' and supported by PO_
+
+- **Groq:**
+  - `GROQ_API_KEY`
+
+- **OpenAI:**
+  - `OPENAI_API_KEY`
+
+- **Anthropic:**
+  - `ANTHROPIC_API_KEY`
+
+- **Google (Gemini):**
+  - `GOOGLE_API_KEY`
+
+- **Mistral:**
+  - `MISTRAL_API_KEY`
+
+- **Ollama:**
+  - Not required.
+
+- **OpenRouter:**
+  - `OPENROUTER_API_KEY`
+
+- **Perplexity:**
+  - `PERPLEXITY_API_KEY`
+
+- **xAI:**
+  - `XAI_API_KEY`
+
+- **DeepSeek:**
+  - `DEEPSEEK_API_KEY`
 

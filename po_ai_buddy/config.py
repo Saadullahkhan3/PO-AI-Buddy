@@ -34,12 +34,12 @@ DEFAULT_CONFIG = {
             "provider": "deepseek/deepseek-chat"
         },
         {
-            "alias": "groq",
-            "provider": "groq/llama-3.1-8b-instant"
+            "alias": "bro",
+            "provider": "groq/llama-3.3-70b-versatile"
         },
         {
-            "alias": "meta",
-            "provider": "meta-llama/llama-guard-4-12b"
+            "alias": "groq",
+            "provider": "groq/llama-3.1-8b-instant"
         }
     ],
     "default_model": "groq",
@@ -101,10 +101,10 @@ class Config:
             if not confirm == "y":
                 # exit_with_error(f"Config file not found. Exiting.")
                 raise FileNotFoundError("Config file not found. Exiting.")
-            self.create_default_global_config()
+            self.create_default_global_config(show_dir=True)
     
 
-    def create_default_global_config(self):
+    def create_default_global_config(self, show_dir=False):
         """Create default config in global directory"""
         global_config_dir = self.get_global_config_dir()
         global_config_dir.mkdir(parents=True, exist_ok=True)
@@ -113,6 +113,7 @@ class Config:
         
         # Default configuration
         self.config_data = DEFAULT_CONFIG
+        print(f"Config File has been created at:\n{self.config_path} \nMake sure to customize it :)") if show_dir else None
         self.save_config()
     
 

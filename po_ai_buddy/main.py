@@ -1,8 +1,9 @@
 import argparse
 
-from po_ai_buddy.ai import AI
+from .ai import AI
 from .config import Config
 from .terminal import SmartTerminal
+from . import __version__
 
 
 
@@ -39,6 +40,10 @@ def handle_config_command(args, config):
 def create_parser():
     """Create argument parser"""
     parser = argparse.ArgumentParser(description='AI Powered Terminal')
+    
+    # Add version argument
+    parser.add_argument('--version', action='version', 
+                       version=f'po-ai-buddy {__version__}')
     
     # Config subcommand
     parser.add_argument('--config', dest='config_action', 
@@ -81,9 +86,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except KeyboardInterrupt:
-        print("\nExiting...")
-        exit(0)
     except Exception as e:
         print(f"An error occurred: {e}")
         exit(1)
