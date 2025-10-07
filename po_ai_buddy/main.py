@@ -59,7 +59,6 @@ def main():
     config = Config()
     ai = AI()
     from pprint import pprint
-    pprint(config.__dict__)
     parser = create_parser()
     args = parser.parse_args()
     

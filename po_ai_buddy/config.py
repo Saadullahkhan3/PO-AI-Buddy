@@ -7,9 +7,6 @@ config file name in JSON:
 '''
 
 DEFAULT_CONFIG = {
-    # "is_ai_identifier": True,
-    # "ai_identifier": "@ai",
-    # "is_context_active": True,
     "indicator": "$",
     "models": [
         {
@@ -46,10 +43,7 @@ DEFAULT_CONFIG = {
 
 }
 
-'''
-Extract all required env vars in config obj -> config.env_x_var
-Do Type changing
-'''
+
 import os
 import json
 from pathlib import Path
@@ -153,19 +147,7 @@ class Config:
         
         models = self.get("models", [])
         valid_alias = list(filter(lambda x: x.get("alias") == alias, models))
-        print(valid_alias)
         if len(valid_alias) == 1:
             return valid_alias[0]["alias"], valid_alias[0]["provider"]
         else:
             return None
-    
-
-    # def provider_for_alias(self, alias: str) -> bool | None:
-    #     """Check if a provider is defined for a given model alias."""
-    #     models = self.get("models", [])
-    #     for model in models:
-    #         if model.get("alias") == alias:
-    #             return model.get("provider") if len(model.get("provider")) > 0 else None
-    #     # filter(lambda x: x.get("alias") == alias, models)
-    #     return None
-

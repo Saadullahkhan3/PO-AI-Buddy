@@ -1,40 +1,15 @@
 from typing import List, Dict, Optional
-import json 
-import os
 from instructor.core.exceptions import ConfigurationError
-'''
-Able to 
-Start a session
-A: Take Input # Add to context(Human)
-B: Give Output # Add to Context(AI)
-C: Either end of Keep continuing BUT with context
-End a session
-
-Context Memory:
-[
-    {AI: ""} 
-    {Human: ""} 
-]
-
-take_human_input ---+
-    |               |
-    V               |
-Give to AI          |
-    L_______________|
-
-
-'''
-
 
 import instructor
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 
 class AIResponse(BaseModel):
     """Pydantic model for the AI's JSON response."""
     output: str
-    cmd: str | None
+    cmd: str = Field(default="")
 
     def __str__(self):
         return f"Output: {self.output} \n CMD: {self.cmd}"
@@ -67,7 +42,7 @@ You ALWAYS give output in JSON format following this format:
     "cmd": "<command-to-execute-only-if-any>"
 }}
 output: Should be a brief answer for user question. 
-cmd: If user have asked for a command then write it there or write null.
+cmd: If user have asked for a command then write it there or write nothing.
 """
 
     def create_client(self, provider: str, api_key: str | None = None):
@@ -109,11 +84,12 @@ cmd: If user have asked for a command then write it there or write null.
             return ""
         
         history = []
-        last = len(self.context_memory) - 1
+        last = len(self.context_memory) - 1 if len(self.context_memory) > 0 else 0
         for i, msg in enumerate(self.context_memory):
             if mark_current_input and i < last:
                 history.append(f"{msg['origin']}: {msg['content']}")
-            history.append(f"Current Input({msg['origin']}): {msg['content']}")
+            else:
+                history.append(f"Current Input({msg['origin']}): {msg['content']}")
         return "\n".join(history)
 
 
@@ -121,18 +97,12 @@ cmd: If user have asked for a command then write it there or write null.
         """Process user query and return response"""        
         self.add_to_context("Human", query)
         response = self.generate_response(client)
-        print("<<<< AI RESPONSE ", response)
         self.add_to_context("AI", str(response))
         return response
 
 
     def generate_response(self, client) -> str:
         """Generate AI response based on query and context"""
-        # for cmd in CMD:
-        #     cmd_key = list(cmd.keys())[0]
-        #     if cmd_key in query.lower:
-        #         return f"Command: {cmd[cmd_key]}"
-        print("++++++++++++   PROMPT -> ", self.get_prompt())
         ai_output_obj = client.chat.completions.create(
             response_model=AIResponse,
             messages=[{"role": "user", "content": self.get_prompt()}],

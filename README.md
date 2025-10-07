@@ -1,105 +1,70 @@
-# AI powered Terminal
+# Introducting the 'PO'
 
-Termianl with AI integration, 
-you can just stop your AI
-OR Told something to AI
+`PO`, the **AI Integrated Terminal**, no more juggling with different windows, just mention different model with your very own alias. We let you to manage your own context.
 
 
+## Bring Your Own Keys!
+You need to give your own keys as environmnet variables. See <a href="env-var">Environment variables</a>
+
+## Configuration
+- **Configuration file:** Contains the alias for specified models, default model, indicator(e.g _$_)
+- **Config File path:** This file path can be global or where from PO called like current directory.
+- **Config file name:** `.po.json`
 
 
-Config File path:
+If no config file found, it will ask for permission to create a global level config. see below:
 
-config file also contains the API key.
+### Global level config(default):
 
-CONFIG_FILE_NAME = ".po.json"
+**Windows:**
+`Path.home() / "AppData" / "Roaming" / "po" / ".po.json"`
 
-Global level config(default):
-
-### Windows
-`Path.home() / "AppData" / "Roaming" / "po" `
-
-### Linux/macOS
-`Path.home() / ".config" / "po"`
+**Linux/MacOS:**
+`Path.home() / ".config" / "po" / ".po.json"`
 
 
-> To invoke our AI/Program, use `PO` keyword
+### Invoke/Project level config:
+If `PO` found its config file where from it called, it will take that config. This allow flexibility.
 
-### How it works?
+Example: 
+```bash
+$ pwd
+/home/myuser/
+$ ls
+.po.json
+$ PO    # This will pick pwd config file
+```
 
-When user invoke our Program via `PO` this will start a REPL with context memory that will be discarded when user want.
+
+## How it works?
+
+When user invoke our **PO** via `PO` this will start a _REPL_ with context memory that can be discarded when user want.
     
 
 Notes: 
 1. Before executing the cmd, program will show the cmd and ask for permission
-2. AI will/can/may be in loop when **prompted**, this mean if AI is processing something, it will keep it in its context until not completed. Like:
+2. Context Management: 
+
 ```bash
-$ PO "can you push it" # AI got invoked, keep context of talk
-$ AI: Here is cmd for push to remote origin main
-    $ git push origin main
-    Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-$ No I do not want to push on origin, what are my remotes?
-$ AI: Oh, I get it, to see your remote, here its cmd
-    $ git remote -v
-    Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-$ y
-$ git remote -v  # pasted by program
-$ origin  https://github.com/<usrename>/<repo-name>.git (fetch)
-$ origin  https://github.com/<usrename>/<repo-name>.git (push)
-$ # Below step may be implemented
-$ AI: Now what I need to do?
-    Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-$ n # AI exited, all loop context gone
+<the-example-soon>
 ```
 
+
+### Example:
+```bash
+<example-here>
+```
 
 ---
 
 
-## Example:
-
-    ```bash
-    $ PO "can you push it" # AI got invoked, keep context of talk
-    $ AI: Here is cmd for push to remote origin main
-        $ git push origin main
-        Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-    $ No I do not want to push on origin, what are my remotes?
-    $ AI: Oh, I get it, to see your remote, here its cmd
-        $ git remote -v
-        Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-    $ y
-    $ git remote -v  # pasted by program
-    $ origin  https://github.com/<usrename>/<repo-name>.git (fetch)
-    $ origin  https://github.com/<usrename>/<repo-name>.git (push)
-    $ # Below step may be implemented
-    $ AI: Now what I need to do?
-        Press y to execute it, n for exit this prompt-loop, or wirte your query: 
-    $ n # AI exited, all loop context gone
-    ```
-
-    - exit
 
 
+<h2 id="env-var">Environment Variables for API Keys:</h2>
+We follow BYOK model and thus you need to give API keys as environment variables.
 
-Instrutor
+> These variables names are opiniated by instructor library.
 
-https://platform.deepseek.com/
-
-
-```mermaid
-flowchart
-A["Use AI powered Terminal(PO)"]
-A ---> B["/ai to invoke AI<br/>Give your query"]
-B ---> C["AI responded"]
-C ---> D{"Continue to talk"}
-D ---> |"YES"| C
-D ---> |"NO"| A
-A ---> G["Normal commands<br/>`git status`"]
-G ---> A
-```
-
-
-
-Environment Variables for API Keys:
 Linux/MacOS:
 ```bash
 export API_KEY_NAME=<your-api-key-here>
@@ -107,11 +72,12 @@ export API_KEY_NAME=<your-api-key-here>
 
 Windows:
 ```bash
-setx DEEPSEEK_API_KEY "your-api-key-here"
+setx API_KEY_NAME "your-api-key-here"
 ```
 
 Variables Names:
+- GROQ_API_KEY
+- OPENAI_API_KEY
 - DEEPSEEK_API_KEY
 - TOGETHER_API_KEY
-- GROQ_API_KEY
 

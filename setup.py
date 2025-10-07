@@ -5,12 +5,10 @@ with open("README.md") as f:
 
 setup(
     name='po_ai_buddy',
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(),
     install_requires=[
-        # depencencies
-        # 'numpy',
-        # 'pandas',
+        "instructor",
     ],
     entry_points={
         "console_scripts": [

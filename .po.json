@@ -28,6 +28,10 @@
         {
             "alias": "groq",
             "provider": "groq/llama-3.1-8b-instant"
+        },
+        {
+            "alias": "m",
+            "provider": "meta-llama/llama-guard-4-12b"
         }
     ],
     "default_model": "groq",

@@ -5,11 +5,6 @@ from po_ai_buddy.ai import AI
 from po_ai_buddy.config import Config 
 
 
-'''
-Since I wanto to allow user to switch betwwen models, so it can't be in AI class
-if self.ai_identifier:
-    query = query.removeprefix(self.ai_identifier).strip()
-'''
 
 class Terminal:
     def __init__(self):
@@ -50,7 +45,6 @@ class SmartTerminal(Terminal):
             elif user_input.startswith("@") or self.previous_msg:  
                 if user_input.startswith("@"):
                     self.alias = user_input.split(" ")[0][1:]
-                    print("ALIAS -> ", self.alias)
                     user_input = user_input.removeprefix("@"+self.alias)
 
                     _alias, self.provider = self.config.get_alias_and_provider(self.alias)
@@ -68,15 +62,15 @@ class SmartTerminal(Terminal):
                     self.client = self.ai.create_client(self.provider)
                     
                     ai_response = self.ai.process_input(self.client, user_input)
-                    print(f"AI: {ai_response.output}")
+                    print(f"AI: {ai_response.output}")      # Don't Touch, actual output
 
                     if ai_response.cmd:
-                        print(f"    CMD: {ai_response.cmd}")
+                        print(f"    CMD: {ai_response.cmd}")    # Don't Touch, actual output
                         confirm = input("Run[y] abort[n] [type more]: ").strip()
                         if confirm.lower() == "y":
                             self.ai.reset_context()
                             self.previous_msg = None
-                            print(ai_response.cmd)      # Illusion to user
+                            print(ai_response.cmd)      # Don't Touch, actual output. Illusion to user
                             self.run_cmd(ai_response.cmd)
                             continue
                     else:
@@ -87,7 +81,6 @@ class SmartTerminal(Terminal):
                         self.previous_msg = None
                     else:
                         self.previous_msg = confirm
-                    print("CURRENT CONTEXT HISTORY: ", self.ai.get_context_history())
 
                 except (ImportError, ConfigurationError) as e:
                     print(f"Provider '{self.provider}' is not installed.\nSee below")
@@ -98,17 +91,12 @@ class SmartTerminal(Terminal):
                     print(e)
 
 
-            # elif user_input.startswith("/"):
-            #     user_input = user_input.removeprefix("/").strip()   
             else:   
-                print("NORMAL EXECUTION ><:><><><><><><><><>")
-                # Normal command execution
                 self.run_cmd(user_input)
 
 
     def __enter__(self):
         """Enter AI conversation mode"""
-        # self.ai_instance = AI()
         self.ai.start_context()
         return self
 
