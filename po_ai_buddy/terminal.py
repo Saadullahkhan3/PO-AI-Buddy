@@ -1,5 +1,5 @@
 import os
-from instructor.core.exceptions import ConfigurationError
+from instructor.core.exceptions import ConfigurationError, InstructorRetryException
 
 from po_ai_buddy.ai import AI
 from po_ai_buddy.config import Config 
@@ -70,7 +70,7 @@ class SmartTerminal(Terminal):
                         if confirm.lower() == "y":
                             self.ai.reset_context()
                             self.previous_msg = None
-                            print(ai_response.cmd)      # Don't Touch, actual output. Illusion to user
+                            print(f"{self.indicator}{ai_response.cmd}")      # Don't Touch, actual output. Illusion to user
                             self.run_cmd(ai_response.cmd)
                             continue
                     else:
@@ -82,9 +82,19 @@ class SmartTerminal(Terminal):
                     else:
                         self.previous_msg = confirm
 
-                except (ImportError, ConfigurationError) as e:
-                    print(f"Provider '{self.provider}' is not installed.\nSee below")
+                except ConfigurationError as e:
+                    print(f"Provider '{self.provider}' might not be configured correctly or un-supported.\nSee below")
                     print(e)
+
+                except ImportError as e:
+                    print(f"Provider '{self.provider}' might need install.\nSee below")
+                    print(e)
+                
+                except InstructorRetryException as e:
+                    print(f"AI model failed to generate a valid response for provider '{self.provider}'. Please try a different model or rephrase your query.")
+                    print(f"Details: {e}")
+                    self.ai.reset_context()
+                    self.previous_msg = None
 
                 except ValueError as e:
                     print(f"Provider '{self.provider}' might be wrong configured/un-supported.\nSee below")
