@@ -28,21 +28,13 @@ class AI:
         self.context_memory: List[Dict[str, str]] = []
 
     def get_prompt(self):
-        return f"""
-ROLE:
-You are a helpful terminal/dev assistant. You can understand every commands. You always answer very briefly and to the point.
+                return f"""
+You are a helpful terminal assistant. Your goal is to understand the user's request and provide a concise natural language response and, if applicable, a shell command to execute.
 
-INPUT:
+Use the `AIResponse` tool to format your answer.
+
+The user's request is:
 {self.get_context_history(mark_current_input=True)}
-
-OUTPUT FORMAT:
-You ALWAYS give output in JSON format following this format:
-{{
-    "output": "<your-output-here>",
-    "cmd": "<command-to-execute-only-if-any>"
-}}
-output: Should be a brief answer for user question. 
-cmd: If user have asked for a command then write it there or write nothing.
 """
 
     def create_client(self, provider: str, api_key: str | None = None):
