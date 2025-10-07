@@ -63,7 +63,7 @@ Notes:
 <h2 id="env-var">Environment Variables for API Keys:</h2>
 We follow BYOK model and thus you need to give API keys as environment variables.
 
-> These variables names are opiniated by instructor library.
+> These variables names are opinionated by instructor library.
 
 Linux/MacOS:
 ```bash

@@ -1,3 +1,7 @@
+from .utils import exit_with_error
+
+
+
 '''
 Initialize config on each program run.
 Thus also allows project level config override.
@@ -18,10 +22,6 @@ DEFAULT_CONFIG = {
             "provider": "google/gemini-pro"
         },
         {
-            "alias": "meta",
-            "provider": "meta"
-        },
-        {
             "alias": "ant",
             "provider": "anthropic/claude-3"
         },
@@ -37,10 +37,13 @@ DEFAULT_CONFIG = {
             "alias": "groq",
             "provider": "groq/llama-3.1-8b-instant"
         },
+        {
+            "alias": "meta",
+            "provider": "meta-llama/llama-guard-4-12b"
+        }
     ],
     "default_model": "groq",
-    "default_model_alias": "bhai",
-
+    "default_model_alias": "bhai"
 }
 
 
@@ -66,7 +69,7 @@ class Config:
     
 
     def get_config_path(self):
-        # return None
+        return None
         """Find config file: pwd first, then global, return None if not found"""
         # Check current directory first
         pwd_config = Path.cwd() / Config.CONFIG_FILE_NAME
@@ -91,10 +94,12 @@ class Config:
                     self.config_data = json.load(f)
             except (json.JSONDecodeError, IOError) as e:
                 raise ValueError(f"Error loading config from {self.config_path}: {e}")
+                # exit_with_error(f"Error loading config from {self.config_path}: {e}")
         else:
             print("No config found, do you want to create a global level config?")
             confirm = input("(y/n): ").lower().strip()
             if not confirm == "y":
+                # exit_with_error(f"Config file not found. Exiting.")
                 raise FileNotFoundError("Config file not found. Exiting.")
             self.create_default_global_config()
     

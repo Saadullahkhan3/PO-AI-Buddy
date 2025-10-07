@@ -10,10 +10,6 @@
             "provider": "google/gemini-pro"
         },
         {
-            "alias": "meta",
-            "provider": "meta"
-        },
-        {
             "alias": "ant",
             "provider": "anthropic/claude-3"
         },
@@ -30,7 +26,7 @@
             "provider": "groq/llama-3.1-8b-instant"
         },
         {
-            "alias": "m",
+            "alias": "meta",
             "provider": "meta-llama/llama-guard-4-12b"
         }
     ],
