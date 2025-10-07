@@ -46,7 +46,24 @@ Notes:
 2. Context Management: 
 
 ```bash
-<the-example-soon>
+PO
+No config found, do you want to create a global level config?
+(y/n): y
+$ @bhai How to push git tags?   # Used alias
+AI: To push a git tag, use the following command: git push --tags. This will push all local tags to the remote repository.
+    CMD: git push --tags    # CMD that AI have given
+Run[y] abort[n] [type more]: what --tags do?    # y for Run, n for cancel, type anything else to keep talking(context maintained)
+AI: The  --tags  option with git push tells Git to push all local tags. Using  git push origin --tags  would specifically push tags to the 'origin' repository.
+    CMD: git push origin --tags
+Run[y] abort[n] [type more]: n  # aborted and clear context
+$ @bhai How to print "Hello world" in terminal?
+AI: Hello world
+    CMD: echo 'Hello world'
+Run[y] abort[n] [type more]: y      # Yes, run the cmd and clear context
+$ echo 'Hello world'    # Written by progra,
+'Hello world'
+$ q     # quit
+Thanks for Using :)
 ```
 
 
