@@ -91,7 +91,7 @@ class SmartTerminal(Terminal):
                     print(e)
                 
                 except InstructorRetryException as e:
-                    print(f"AI model failed to generate a valid response for provider '{self.provider}'. Please try a different model or rephrase your query.")
+                    print(f"AI model failed to generate a valid response for provider '{self.provider}'. \n- Please try a different model or rephrase your query.\n- Check your API have access to that specific model?")
                     print(f"Details: {e}")
                     self.ai.reset_context()
                     self.previous_msg = None
