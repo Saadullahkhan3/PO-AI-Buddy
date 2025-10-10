@@ -43,7 +43,8 @@ def create_parser():
     
     # Add version argument
     parser.add_argument('--version', action='version', 
-                       version=f'po-ai-buddy {__version__}')
+                       version=f'po-ai-buddy {__version__}',
+                       help="Shows the version of the tool in `po-ai-buddy <version>` format.")
     
     # Config subcommand
     parser.add_argument('--config', dest='config_action', 

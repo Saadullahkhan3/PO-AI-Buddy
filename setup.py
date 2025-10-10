@@ -9,15 +9,18 @@ def get_version():
         else:
             raise ValueError("setup.py: version isn't found.")
 
+__version__ = get_version()
+print("Version:", __version__)
+
 with open("README.md") as f:
     long_description = f.read()
 
 setup(
     name='po_ai_buddy',
-    version=get_version(),
+    version=__version__,
     packages=find_packages(),
     install_requires=[
-        "instructor",
+        "instructor==1.11.3",
     ],
     entry_points={
         "console_scripts": [
