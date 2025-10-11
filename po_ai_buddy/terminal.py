@@ -100,6 +100,22 @@ class SmartTerminal(Terminal):
                     print(f"Provider '{self.provider}' might be wrong configured/un-supported.\nSee below")
                     print(e)
 
+                except Exception as e:
+                    # Check for authentication-related errors by examining error message
+                    error_msg = str(e).lower()
+                    if any(keyword in error_msg for keyword in ['api_key', 'api key', 'authentication', 'unauthorized', 'credential', 'token', 'environment', 'environment variable', "error initializing", "client"]):
+                        print(f"Maybe Authentication Error for provider, make sure to check:")
+                        print(f"  - API key is missing, invalid, doesn't have the scope of specified model")
+                        print(f"  - Check the environment variable, spelling mistake, wrong key, scope (e.g user-specific)")
+                        print(f"  - Verify your config")
+                        print(f"Details: {e}")
+                        self.ai.reset_context()
+                        self.previous_msg = None
+                        continue
+
+                    print(f"An error occurred:\nSee below:{e}")
+                    print("Try re-running the program again.")
+
             else:   
                 self.run_cmd(user_input)
 
