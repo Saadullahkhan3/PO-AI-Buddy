@@ -4,8 +4,10 @@
 
 ## Installation
 ```bash
-pip install -i https://test.pypi.org/simple/ po-ai-buddy
-po --version  # if installation is correct, should give version like 1.1.1
+pip install --index-url https://test.pypi.org/simple/ \
+  --extra-index-url https://pypi.org/simple \
+  po-ai-buddy --upgrade
+po --version  # if installation is correct, output version like `po-ai-buddy 1.1.1`
 ```
 
 ## Bring Your Own Keys!
