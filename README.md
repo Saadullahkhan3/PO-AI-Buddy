@@ -3,15 +3,23 @@
 `PO`, the **AI Integrated Terminal**, no more juggling with different windows, just mention different model with your very own alias. We let you to manage your own context.
 
 ## Installation
+
+You need to run below command(if you are on TestPyPI, don't run above provided command). The reason is that `PO` itself is on `TestPyPI` while its dependencies are on `PyPI`, so to enable PyPI also, we need below command
 ```bash
 pip install --index-url https://test.pypi.org/simple/ \
   --extra-index-url https://pypi.org/simple \
   po-ai-buddy --upgrade
+```
+
+- Check version
+```bash
 po --version  # if installation is correct, output version like `po-ai-buddy 1.1.1`
 ```
 
 ## Bring Your Own Keys!
 You need to give your own keys as environmnet variables. See <a href="#env-var">Environment variables</a>
+
+**Important:** The AI models you use must support **function calling/tool calling** (also known as structured outputs). Most modern models support this, but verify with your provider before use.
 
 ## Configuration
 - **Configuration file:** Contains the alias for specified models, default model, indicator(e.g _$_)
@@ -45,12 +53,27 @@ $ PO    # This will pick pwd config file
 
 ## How it works?
 
+You can start this program via 2 methods.
+
+### 1. Quick Start
+
+When user invoke our **PO** via `PO` and give query on-the-fly/while Invoke-ing the program, this becomes a *short-hand* which you can use to increase efficency. This will start a _REPL_ with context memory that can be discarded when user want.
+
+> Note: Make sure to wrap queries in ""/'' especially On Windows PowerShell as `@` will be treated as special character and may even not pass it to PO.
+
+```bash
+PO "@ai how at delete a file?"
+Processing query: @ai how at delete a file?   # DEBUG
+AI: To delete a file, use the 'rm' command followed by the file name.
+    CMD: rm
+Run[y] abort[n] [type more]: n
+$ q
+Thanks for Using :)
+```
+
+### 2. Invoke Based
 When user invoke our **PO** via `PO` this will start a _REPL_ with context memory that can be discarded when user want.
     
-
-Notes: 
-1. Before executing the cmd, program will show the cmd and ask for permission
-2. Context Management: 
 
 ```bash
 PO
@@ -73,8 +96,25 @@ $ q     # quit
 Thanks for Using :)
 ```
 
-### Multiple-Model without losing context
+
+### Notes: 
+- Before executing the cmd, program will show the cmd and ask for permission, 
+
+### Input Options
+
+| Option | Effect |
+|---|---|
+| y | Will run the shown command, discard the context memory and exit AI loop(not PO itself) |
+| n | Will discard the context memory and exit AI loop(not PO itself) |
+| type more | Write your query to model as feedback, this will also use your current context, continues the AI loop
+
+
+## Multiple-Model without losing context
+
+You can change model on-the-fly, just my mentioning it. If user is already in loop(talking) and not mention any model, we will use previously used model.
+
 > Note: I know this example is slightly weird
+
 ```bash
 PO
 $ @bro How to merge two branches?
@@ -110,40 +150,63 @@ setx API_KEY_NAME "your-api-key-here"
 
 ### API KEYS
 
-
 You need to provider API keys as environment variables. Below you can the corresponding variable name.
+
+_If you don't have any API keys, I recommended you to use Groq's API for demo_
 
 > Note: Not full list.
 
 _Make sure that your selected model support 'tooling' and supported by PO_
 
-- **Groq:**
-  - `GROQ_API_KEY`
+- **Groq:** `GROQ_API_KEY`
 
-- **OpenAI:**
-  - `OPENAI_API_KEY`
+- **OpenAI:** `OPENAI_API_KEY`
 
-- **Anthropic:**
-  - `ANTHROPIC_API_KEY`
+- **Anthropic:** `ANTHROPIC_API_KEY`
 
-- **Google (Gemini):**
-  - `GOOGLE_API_KEY`
+- **Google (Gemini):** `GOOGLE_API_KEY`
 
-- **Mistral:**
-  - `MISTRAL_API_KEY`
+- **Mistral:** `MISTRAL_API_KEY`
 
-- **Ollama:**
-  - Not required.
+- **Ollama:** Not required.
 
-- **OpenRouter:**
-  - `OPENROUTER_API_KEY`
+- **OpenRouter:** `OPENROUTER_API_KEY`
 
-- **Perplexity:**
-  - `PERPLEXITY_API_KEY`
+- **Perplexity:** `PERPLEXITY_API_KEY`
 
-- **xAI:**
-  - `XAI_API_KEY`
+- **xAI:** `XAI_API_KEY`
 
-- **DeepSeek:**
-  - `DEEPSEEK_API_KEY`
+- **DeepSeek:** `DEEPSEEK_API_KEY`
 
+
+## FAQs
+
+### Q: Why does `@ai` get stripped when I type it in PowerShell/Terminal?
+**A:** PowerShell treats `@` as a special operator. Always wrap your queries in quotes: `PO "@ai your query"`. This may also be happened with other terminals so always wrap Quick Start queries in quotes.
+
+### Q: I'm getting "Provider might be wrong configured/un-supported" error. What's wrong?
+**A:** This usually means:
+1. Your model doesn't support function calling/tool calling (structured outputs)
+2. The provider's Python library isn't installed (e.g., `pip install openai`)
+3. Your API key environment variable isn't set correctly
+
+Use models that support tooling, such as `groq/llama-3.1-8b-instant` or `openai/gpt-4`.
+
+### Q: Can I use this offline?
+**A:** Yes(not quite)! Install Ollama locally and use the `ollama/*` provider. No API key needed. But you need a HEAVY computer to handle models.
+
+### Q: How do I clear my conversation context?
+**A:** Type `n` when prompted, or the context automatically clears after running a command with `y`.
+
+### Q: Why add `@` every time when I want to talk to AI?
+**A:** The answer is your question, you only need to add `@` when you want to talk to AI, for convience, if you entered in AI loop(start talking to AI) you don't need to write `@` again and again, just write your query, you only need it if your want to change your model.
+
+
+---
+
+*Nobody has asked anything else yet :)*
+Nobody has asked anything :)
+
+---
+
+## [PO — AI Buddy](https://github.com/Saadullahkhan3/PO-AI-Buddy)
