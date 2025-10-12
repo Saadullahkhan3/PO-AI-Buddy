@@ -36,6 +36,11 @@ DEFAULT_CONFIG = {
         {
             "alias": "groq",
             "provider": "groq/llama-3.1-8b-instant"
+        },
+        {
+            "alias": "own",
+            "provider": "ollama//models/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+            "base_url": "http://158.101.98.132:9090/"
         }
     ],
     "default_model": "groq",
@@ -142,7 +147,7 @@ class Config:
     
 
     def get_alias_and_provider(self, alias: str) -> tuple[str | None, str | None]:
-        """Get alias and provider for a given alias, with fallback to default."""
+        """Get alias, provider, and base_url for a given alias, with fallback to default."""
         default_alias_keyword = self.get("default_model_alias")
         
         # If user typed the default alias keyword (e.g., "bhai"), resolve to actual default model
@@ -154,15 +159,17 @@ class Config:
         # Try to find the requested alias
         valid_alias = list(filter(lambda x: x.get("alias") == alias, models))
         if len(valid_alias) == 1:
-            return valid_alias[0]["alias"], valid_alias[0]["provider"]
+            model = valid_alias[0]
+            return model.get("alias"), model.get("provider"), model.get("base_url")
         
         # Alias not found, try to use the default model as fallback
         default_model = self.get("default_model")
         matched_default = list(filter(lambda x: x.get("alias") == default_model, models))
         
         if len(matched_default) == 1:
-            return default_model, matched_default[0].get("provider")
+            model = matched_default[0]
+            return default_model, model.get("provider"), model.get("base_url")
         
         # No valid alias or default found
-        return None, None
+        return None, None, None
 

@@ -37,16 +37,25 @@ The user's request is:
 {self.get_context_history(mark_current_input=True)}
 """
 
-    def create_client(self, provider: str, api_key: str | None = None):
+    def create_client(self, provider: str, api_key: str | None = None, base_url: str | None = None):
         """Creates an instructor client for the given provider."""
         try:
             # If an API key is provided, use it. Otherwise, instructor will
             # look for environment variables.
-            if api_key:
+            if base_url:
+                self.model_name = provider.split("/", 1)[1] if "/" in provider else provider
+
+                # For custom endpoints
+                import openai
+                client = openai.OpenAI(base_url=base_url, api_key=api_key or "dummy")
+                return instructor.from_openai(client)
+            elif api_key:
                 return instructor.from_provider(provider, api_key=api_key)
             else:
                 return instructor.from_provider(provider)
+            
         except (ValueError, ImportError, ConfigurationError) as e:
+            print(f"Failed to create client for '{provider}': {e}")
             raise
 
 
@@ -95,10 +104,17 @@ The user's request is:
 
     def generate_response(self, client) -> str:
         """Generate AI response based on query and context"""
-        ai_output_obj = client.chat.completions.create(
-            response_model=AIResponse,
-            messages=[{"role": "user", "content": self.get_prompt()}],
-        )
+        # Build the completion arguments
+        completion_args = {
+            "response_model": AIResponse,
+            "messages": [{"role": "user", "content": self.get_prompt()}],
+        }
+        
+        # Add model parameter if using a custom endpoint
+        if self.model_name:
+            completion_args["model"] = self.model_name
+        
+        ai_output_obj = client.chat.completions.create(**completion_args)
         return ai_output_obj
 
     def parse_ai_output(self, ai_output: str) -> Optional[Dict[str, str]]:

@@ -29,13 +29,14 @@ class SmartTerminal(Terminal):
         self.indicator = self.config.get("indicator") + " " if len(self.config.get("indicator")) > 0 else ""
         self.client = None
         self.previous_msg = None
+        self.base_url = None
 
 
-    def set_alias_and_provider(self, user_input: str) -> None:
+    def set_alias_provider_and_base_url(self, user_input: str) -> None:
         self.alias = user_input.split(" ")[0][1:]
         user_input = user_input.removeprefix("@"+self.alias)
 
-        _alias, self.provider = self.config.get_alias_and_provider(self.alias)
+        _alias, self.provider, self.base_url = self.config.get_alias_and_provider(self.alias)
         if _alias is None:
             print(f"Model '{self.alias}' not found in config.")
             raise Exception("Neither mentioned model found nor Default Model. Please check config file!")           
@@ -51,10 +52,10 @@ class SmartTerminal(Terminal):
         # Checking again, in case user have mentioned alias again,
         # OR this function is directly called
         if user_input.startswith("@"):
-            self.set_alias_and_provider(user_input)
+            self.set_alias_provider_and_base_url(user_input)
         
         try:
-            self.client = self.ai.create_client(self.provider)
+            self.client = self.ai.create_client(self.provider, base_url=self.base_url)
             
             ai_response = self.ai.process_input(self.client, user_input)
             print(f"AI: {ai_response.output}")      # Don't Touch, actual output
