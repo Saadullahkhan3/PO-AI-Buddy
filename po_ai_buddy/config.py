@@ -1,7 +1,3 @@
-from .utils import exit_with_error
-
-
-
 '''
 Initialize config on each program run.
 Thus also allows project level config override.
@@ -145,15 +141,28 @@ class Config:
         return self.config_path and self.config_path.parent == self.get_global_config_dir()
     
 
-    def get_alias_and_provider(self, alias: str, include_default: bool = True) -> bool:
-        """Check if a model alias exists in the config."""
-        default = self.get("default_model_alias") if include_default else None
-        if alias in default:
+    def get_alias_and_provider(self, alias: str) -> tuple[str | None, str | None]:
+        """Get alias and provider for a given alias, with fallback to default."""
+        default_alias_keyword = self.get("default_model_alias")
+        
+        # If user typed the default alias keyword (e.g., "bhai"), resolve to actual default model
+        if alias == default_alias_keyword:
             alias = self.get("default_model")
         
         models = self.get("models", [])
+        
+        # Try to find the requested alias
         valid_alias = list(filter(lambda x: x.get("alias") == alias, models))
         if len(valid_alias) == 1:
             return valid_alias[0]["alias"], valid_alias[0]["provider"]
-        else:
-            return None
+        
+        # Alias not found, try to use the default model as fallback
+        default_model = self.get("default_model")
+        matched_default = list(filter(lambda x: x.get("alias") == default_model, models))
+        
+        if len(matched_default) == 1:
+            return default_model, matched_default[0].get("provider")
+        
+        # No valid alias or default found
+        return None, None
+
