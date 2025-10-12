@@ -4,6 +4,8 @@
 
 ## Installation
 
+**TestPyPI:** https://test.pypi.org/project/po-ai-buddy/
+
 You need to run below command(if you are on TestPyPI, don't run above provided command). The reason is that `PO` itself is on `TestPyPI` while its dependencies are on `PyPI`, so to enable PyPI also, we need below command
 ```bash
 pip install --index-url https://test.pypi.org/simple/ \
