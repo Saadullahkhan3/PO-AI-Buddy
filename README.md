@@ -21,6 +21,19 @@ You need to give your own keys as environmnet variables. See <a href="#env-var">
 
 **Important:** The AI models you use must support **function calling/tool calling** (also known as structured outputs). Most modern models support this, but verify with your provider before use.
 
+> Note: You can use your custom self-hosted models, but those models should be running by `ollama` and follow `openai` structure. Also enabled `tooling` while running via `ollama`
+<details>
+<summary>Example(for note):</summary>
+
+```json
+{
+    "alias": "own",
+    "provider": "ollama//models/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+    "base_url": "http://192.168.0.1:9090/"
+}
+```
+</details>
+
 ## Configuration
 - **Configuration file:** Contains the alias for specified models, default model, indicator(e.g _$_)
 - **Config File path:** This file path can be global or where from PO called like current directory.

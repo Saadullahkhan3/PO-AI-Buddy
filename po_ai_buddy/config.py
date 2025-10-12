@@ -40,7 +40,7 @@ DEFAULT_CONFIG = {
         {
             "alias": "own",
             "provider": "ollama//models/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
-            "base_url": "http://158.101.98.132:9090/"
+            "base_url": "http://192.168.0.1:9090/"
         }
     ],
     "default_model": "groq",
