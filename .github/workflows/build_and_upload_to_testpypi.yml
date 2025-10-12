@@ -1,0 +1,33 @@
+name: Upload to TestPyPI
+
+on:
+  branches:
+    - main
+  tags:
+    - "*.*.*"
+  workflow_dispatch:
+
+jobs:
+  Build_and_Upload_to_TestPyPI:
+    runs-on: ubuntu-latest
+    environment: test_pypi
+    env:
+      TWINE_USERNAME: __token__
+      TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
+    steps:
+      - name: Checkout the Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Build Tools
+        run: pip install setuptools wheel twine
+
+      - name: Build the wheel
+        run: python setup.py sdist bdist_wheel
+
+      - name: Upload to TestPyPI
+        run: twine upload --repository testpypi dist/*
