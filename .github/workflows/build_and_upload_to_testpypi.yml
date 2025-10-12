@@ -1,9 +1,9 @@
-name: Upload to TestPyPI
+name: Build and Upload to TestPyPI
 
 on:
-  branches:
-    - main
-  tags:
+  # Only run on tags and manual triggers
+  push:
+    tags:
     - "*.*.*"
   workflow_dispatch:
 
