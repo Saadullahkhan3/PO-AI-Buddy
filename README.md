@@ -204,8 +204,7 @@ Use models that support tooling, such as `groq/llama-3.1-8b-instant` or `openai/
 
 ---
 
-*Nobody has asked anything else yet :)*
-Nobody has asked anything :)
+Nobody has asked anything, these FAQs are self-assumed :)
 
 ---
 
