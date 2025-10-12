@@ -73,14 +73,15 @@ def main():
         handle_config_command(args, config)
         return
     
-    # Handle regular queries
-    if args.query:
-        query = ' '.join(args.query)
-        print(f"Processing query: {query}")
-        return
-    
     with SmartTerminal(config, ai) as smart:
-        smart.repl()
+        # Quick Start
+        if args.query:
+            query = ' '.join(args.query)
+            smart.repl(quick_start=True, quick_input=query)
+        
+        # Invoke
+        else:
+            smart.repl()
 
 
 
