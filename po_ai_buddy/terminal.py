@@ -31,10 +31,96 @@ class SmartTerminal(Terminal):
         self.previous_msg = None
 
 
-    def repl(self):  
+    def set_alias_and_provider(self, user_input: str) -> None:
+        self.alias = user_input.split(" ")[0][1:]
+        user_input = user_input.removeprefix("@"+self.alias)
+
+        _alias, self.provider = self.config.get_alias_and_provider(self.alias)
+        if _alias is None:
+            print(f"Model '{self.alias}' not found in config.")
+            raise Exception("Neither mentioned model found nor Default Model. Please check config file!")           
+        else:
+            self.alias = _alias
+
+        if self.provider is None:
+            msg = f"Provider '{self.provider}' for alias '{self.alias}' don't exists"
+            raise Exception(msg)
+        
+
+    def handle_ai_input(self, user_input: str) -> None:
+        # Checking again, in case user have mentioned alias again,
+        # OR this function is directly called
+        if user_input.startswith("@"):
+            self.set_alias_and_provider(user_input)
+        
+        try:
+            self.client = self.ai.create_client(self.provider)
+            
+            ai_response = self.ai.process_input(self.client, user_input)
+            print(f"AI: {ai_response.output}")      # Don't Touch, actual output
+
+            if ai_response.cmd.strip():
+                print(f"    CMD: {ai_response.cmd}")    # Don't Touch, actual output
+                confirm = input("Run[y] abort[n] [type more]: ").strip()
+                if confirm.lower() == "y":
+                    self.ai.reset_context()
+                    self.previous_msg = None
+                    print(f"{self.indicator}{ai_response.cmd}")      # Don't Touch, actual output. Illusion to user
+                    self.run_cmd(ai_response.cmd)
+                    return
+            else:
+                confirm = input("abort[n] [type more]: ").strip()
+
+            if confirm.lower() == "n":
+                self.ai.reset_context()
+                self.previous_msg = None
+            else:
+                self.previous_msg = confirm
+
+        except ConfigurationError as e:
+            print(f"Provider '{self.provider}' might not be configured correctly or un-supported.\nSee below")
+            print(e)
+
+        except ImportError as e:
+            print(f"Provider '{self.provider}' might need install.\nSee below")
+            print(e)
+        
+        except InstructorRetryException as e:
+            print(f"AI model failed to generate a valid response for provider '{self.provider}'. \n- Please try a different model or rephrase your query.\n- Check your API have access to that specific model?")
+            print(f"Details: {e}")
+            self.ai.reset_context()
+            self.previous_msg = None
+
+        except ValueError as e:
+            print(f"Provider '{self.provider}' might be wrong configured/un-supported.\nSee below")
+            print(e)
+
+        except Exception as e:
+            # Check for authentication-related errors by examining error message
+            error_msg = str(e).lower()
+            if any(keyword in error_msg for keyword in ['api_key', 'api key', 'authentication', 'unauthorized', 'credential', 'token', 'environment', 'environment variable', "error initializing", "client"]):
+                print(f"Maybe Authentication Error for provider, make sure to check:")
+                print(f"  - API key is missing, invalid, doesn't have the scope of specified model")
+                print(f"  - Check the environment variable, spelling mistake, wrong key, scope (e.g user-specific)")
+                print(f"  - Verify your config")
+                print(f"Details: {e}")
+                self.ai.reset_context()
+                self.previous_msg = None
+                return
+
+            print(f"An error occurred:\nSee below:{e}")
+            print("Try re-running the program again.")
+
+
+    def repl(self, quick_start: bool = False, quick_input: str = ""):
         while True:
             if not self.previous_msg is None:
                 user_input = self.previous_msg
+                self.previous_msg = None
+            elif quick_start and quick_input.strip():
+                user_input = quick_input
+                quick_start = False
+                quick_input = False     # Memory saving :)
             else:
                 user_input = input(self.indicator).strip()
             
@@ -43,78 +129,7 @@ class SmartTerminal(Terminal):
                 exit(0)
 
             elif user_input.startswith("@") or self.previous_msg:  
-                if user_input.startswith("@"):
-                    self.alias = user_input.split(" ")[0][1:]
-                    user_input = user_input.removeprefix("@"+self.alias)
-
-                    _alias, self.provider = self.config.get_alias_and_provider(self.alias)
-                    if _alias is None:
-                        print(f"Model '{self.alias}' not found in config.")
-                        raise Exception("Neither mentioned model found nor Default Model. Please check config file!")           
-                    else:
-                        self.alias = _alias
-
-                    if not self.provider:
-                        msg = f"Provider '{self.provider}' for alias '{self.alias}' don't exists"
-                        raise Exception(msg)
-                
-                try:
-                    self.client = self.ai.create_client(self.provider)
-                    
-                    ai_response = self.ai.process_input(self.client, user_input)
-                    print(f"AI: {ai_response.output}")      # Don't Touch, actual output
-
-                    if ai_response.cmd:
-                        print(f"    CMD: {ai_response.cmd}")    # Don't Touch, actual output
-                        confirm = input("Run[y] abort[n] [type more]: ").strip()
-                        if confirm.lower() == "y":
-                            self.ai.reset_context()
-                            self.previous_msg = None
-                            print(f"{self.indicator}{ai_response.cmd}")      # Don't Touch, actual output. Illusion to user
-                            self.run_cmd(ai_response.cmd)
-                            continue
-                    else:
-                        confirm = input("abort[n] [type more]: ").strip()
-
-                    if confirm.lower() == "n":
-                        self.ai.reset_context()
-                        self.previous_msg = None
-                    else:
-                        self.previous_msg = confirm
-
-                except ConfigurationError as e:
-                    print(f"Provider '{self.provider}' might not be configured correctly or un-supported.\nSee below")
-                    print(e)
-
-                except ImportError as e:
-                    print(f"Provider '{self.provider}' might need install.\nSee below")
-                    print(e)
-                
-                except InstructorRetryException as e:
-                    print(f"AI model failed to generate a valid response for provider '{self.provider}'. \n- Please try a different model or rephrase your query.\n- Check your API have access to that specific model?")
-                    print(f"Details: {e}")
-                    self.ai.reset_context()
-                    self.previous_msg = None
-
-                except ValueError as e:
-                    print(f"Provider '{self.provider}' might be wrong configured/un-supported.\nSee below")
-                    print(e)
-
-                except Exception as e:
-                    # Check for authentication-related errors by examining error message
-                    error_msg = str(e).lower()
-                    if any(keyword in error_msg for keyword in ['api_key', 'api key', 'authentication', 'unauthorized', 'credential', 'token', 'environment', 'environment variable', "error initializing", "client"]):
-                        print(f"Maybe Authentication Error for provider, make sure to check:")
-                        print(f"  - API key is missing, invalid, doesn't have the scope of specified model")
-                        print(f"  - Check the environment variable, spelling mistake, wrong key, scope (e.g user-specific)")
-                        print(f"  - Verify your config")
-                        print(f"Details: {e}")
-                        self.ai.reset_context()
-                        self.previous_msg = None
-                        continue
-
-                    print(f"An error occurred:\nSee below:{e}")
-                    print("Try re-running the program again.")
+                self.handle_ai_input(user_input)                
 
             else:   
                 self.run_cmd(user_input)
