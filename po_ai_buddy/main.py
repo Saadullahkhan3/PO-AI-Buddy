@@ -7,7 +7,7 @@ from . import __version__
 
 
 
-def handle_config_command(args, config):
+def handle_config_command(args: argparse.Namespace, config: Config) -> None:
     """Handle --config subcommands"""
     match args.config_action:
         case 'show':
@@ -15,7 +15,6 @@ def handle_config_command(args, config):
             print(f"Is project config: {config.is_project_config()}")
             print(f"Is global config: {config.is_global_config()}")
 
-    
         case 'set':
             if not args.key or not args.value:
                 print("Error: --config set requires --key and --value")
@@ -37,7 +36,7 @@ def handle_config_command(args, config):
             print("No flag passed, read the documentation please.")
 
 
-def create_parser():
+def create_parser() -> argparse.ArgumentParser:
     """Create argument parser"""
     parser = argparse.ArgumentParser(description='AI Powered Terminal')
     
@@ -61,10 +60,10 @@ def create_parser():
     return parser
 
 
-def main():
+def main() -> None:
     config = Config()
     ai = AI()
-    from pprint import pprint
+    
     parser = create_parser()
     args = parser.parse_args()
     
@@ -91,3 +90,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"An error occurred: {e}")
         exit(1)
+

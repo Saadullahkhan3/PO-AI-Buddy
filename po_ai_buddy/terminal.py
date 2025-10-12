@@ -1,4 +1,8 @@
+from __future__ import annotations
 import os
+from types import TracebackType
+from typing import Any
+
 from instructor.core.exceptions import ConfigurationError, InstructorRetryException
 
 from po_ai_buddy.ai import AI
@@ -7,11 +11,11 @@ from po_ai_buddy.config import Config
 
 
 class Terminal:
-    def __init__(self):
-        self.cwd = os.getcwd()
+    def __init__(self) -> None:
+        self.cwd: str = os.getcwd()
 
 
-    def run_cmd(self, cmd: str) -> str:
+    def run_cmd(self, cmd: str) -> int:
         try:
             output = os.system(cmd)
         except Exception as e:
@@ -21,22 +25,23 @@ class Terminal:
 
 
 class SmartTerminal(Terminal):
-    def __init__(self, config: Config, ai: AI):
+    def __init__(self, config: Config, ai: AI) -> None:
         super().__init__()
-        self.ai_instance = None
-        self.config = config
-        self.ai = ai
-        self.indicator = self.config.get("indicator") + " " if len(self.config.get("indicator")) > 0 else ""
-        self.client = None
-        self.previous_msg = None
-        self.base_url = None
+        self.config: Config = config
+        self.ai: AI = ai
+        self.indicator: str = self.config.get("indicator") + " " if len(self.config.get("indicator")) > 0 else ""
+        self.client: Any | None = None
+        self.previous_msg: str | None = None
+        self.base_url: str | None = None
+        self.alias: str | None = None
+        self.provider: str | None = None 
 
 
     def set_alias_provider_and_base_url(self, user_input: str) -> None:
         self.alias = user_input.split(" ")[0][1:]
         user_input = user_input.removeprefix("@"+self.alias)
 
-        _alias, self.provider, self.base_url = self.config.get_alias_and_provider(self.alias)
+        _alias, self.provider, self.base_url = self.config.get_alias_provider_and_base_url(self.alias)
         if _alias is None:
             print(f"Model '{self.alias}' not found in config.")
             raise Exception("Neither mentioned model found nor Default Model. Please check config file!")           
@@ -49,8 +54,7 @@ class SmartTerminal(Terminal):
         
 
     def handle_ai_input(self, user_input: str) -> None:
-        # Checking again, in case user have mentioned alias again,
-        # OR this function is directly called
+        # Checking again, in case user have mentioned alias again
         if user_input.startswith("@"):
             self.set_alias_provider_and_base_url(user_input)
         
@@ -113,7 +117,7 @@ class SmartTerminal(Terminal):
             print("Try re-running the program again.")
 
 
-    def repl(self, quick_start: bool = False, quick_input: str = ""):
+    def repl(self, quick_start: bool = False, quick_input: str = "") -> None:
         while True:
             if not self.previous_msg is None:
                 user_input = self.previous_msg
@@ -136,13 +140,13 @@ class SmartTerminal(Terminal):
                 self.run_cmd(user_input)
 
 
-    def __enter__(self):
+    def __enter__(self) -> SmartTerminal:
         """Enter AI conversation mode"""
         self.ai.start_context()
         return self
 
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None) -> None:
         """Exit AI conversation mode"""
         if self.ai:
             self.ai.end_context()

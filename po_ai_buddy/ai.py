@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import Any, List, Dict, Optional
 from instructor.core.exceptions import ConfigurationError
 
 import instructor
@@ -24,10 +24,12 @@ CMD = [
   
 
 class AI:
-    def __init__(self):
+    def __init__(self) -> None:
         self.context_memory: List[Dict[str, str]] = []
+        self.model_name: str | None = None
 
-    def get_prompt(self):
+
+    def get_prompt(self) -> str:
                 return f"""
 You are a helpful terminal assistant. Your goal is to understand the user's request and provide a concise natural language response and, if applicable, a shell command to execute.
 
@@ -37,7 +39,8 @@ The user's request is:
 {self.get_context_history(mark_current_input=True)}
 """
 
-    def create_client(self, provider: str, api_key: str | None = None, base_url: str | None = None):
+
+    def create_client(self, provider: str, api_key: str | None = None, base_url: str | None = None) -> Any:
         """Creates an instructor client for the given provider."""
         try:
             # If an API key is provided, use it. Otherwise, instructor will
@@ -63,15 +66,18 @@ The user's request is:
         """Start a new context session"""
         self.context_memory = []
 
+
     def reset_context(self) -> None:
         """Reset exisiting context session"""
         self.context_memory = []
+
 
     def end_context(self) -> None:
         """End the current context session"""
         self.context_memory = []
 
-    def add_to_context(self, origin: str, content: str):
+
+    def add_to_context(self, origin: str, content: str) -> None:
         """Add a message to the context"""
         self.context_memory.append({
             "origin": origin,
@@ -102,7 +108,7 @@ The user's request is:
         return response
 
 
-    def generate_response(self, client) -> str:
+    def generate_response(self, client: Any) -> AIResponse:
         """Generate AI response based on query and context"""
         # Build the completion arguments
         completion_args = {
@@ -116,22 +122,4 @@ The user's request is:
         
         ai_output_obj = client.chat.completions.create(**completion_args)
         return ai_output_obj
-
-    def parse_ai_output(self, ai_output: str) -> Optional[Dict[str, str]]:
-        """Parse AI output to extract command and output"""
-        try:
-            import json
-            data = json.loads(ai_output)
-            if "output" in data and "cmd" in data:
-                return (data, True)
-            else:
-                return (ai_output, False)
-        except json.JSONDecodeError:
-            return (ai_output, False)
-        
-
-
-
-
-
 

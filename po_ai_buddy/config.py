@@ -6,7 +6,14 @@ config file name in JSON:
 .po.json
 '''
 
-DEFAULT_CONFIG = {
+import os
+import json
+from pathlib import Path
+from typing import Any
+
+
+
+DEFAULT_CONFIG: dict[str, Any] = {
     "indicator": "$",
     "models": [
         {
@@ -48,20 +55,17 @@ DEFAULT_CONFIG = {
 }
 
 
-import os
-import json
-from pathlib import Path
 
 class Config:
-    CONFIG_FILE_NAME = ".po.json"
+    CONFIG_FILE_NAME: str = ".po.json"
     
-    def __init__(self):
-        self.config_data = {}
-        self.config_path = None
+    def __init__(self) -> None:
+        self.config_data: dict[str, Any] = {}
+        self.config_path: Path | None = None
         self.load_config()
     
 
-    def get_global_config_dir(self):
+    def get_global_config_dir(self) -> Path:
         """Get platform-specific global config directory"""
         if os.name == 'nt':  # Windows
             return Path.home() / "AppData" / "Roaming" / "po"
@@ -69,7 +73,7 @@ class Config:
             return Path.home() / ".config" / "po"
     
 
-    def get_config_path(self):
+    def get_config_path(self) -> Path | None:
         # return None
         """Find config file: pwd first, then global, return None if not found"""
         # Check current directory first
@@ -85,7 +89,7 @@ class Config:
         return None
     
 
-    def load_config(self):
+    def load_config(self) -> None:
         """Load config from file or create default"""
         self.config_path = self.get_config_path()
         
@@ -95,7 +99,7 @@ class Config:
                     self.config_data = json.load(f)
             except (json.JSONDecodeError, IOError) as e:
                 raise ValueError(f"Error loading config from {self.config_path}: {e}")
-                # exit_with_error(f"Error loading config from {self.config_path}: {e}")
+                
         else:
             print("No config found, do you want to create a global level config?")
             confirm = input("(y/n): ").lower().strip()
@@ -105,7 +109,7 @@ class Config:
             self.create_default_global_config(show_dir=True)
     
 
-    def create_default_global_config(self, show_dir=False):
+    def create_default_global_config(self, show_dir: bool = False) -> None:
         """Create default config in global directory"""
         global_config_dir = self.get_global_config_dir()
         global_config_dir.mkdir(parents=True, exist_ok=True)
@@ -118,35 +122,35 @@ class Config:
         self.save_config()
     
 
-    def save_config(self):
+    def save_config(self) -> None:
         """Save current config to file"""
         if self.config_path:
             with open(self.config_path, 'w') as f:
                 json.dump(self.config_data, f, indent=4)
     
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: Any = None) -> Any:
         """Get config value"""
         return self.config_data.get(key, default)
     
 
-    def set(self, key, value):
+    def set(self, key: str, value: Any) -> None:
         """Set config value and save"""
         self.config_data[key] = value
         self.save_config()
     
 
-    def is_project_config(self):
+    def is_project_config(self) -> bool:
         """Check if current config is project-level"""
         return self.config_path and self.config_path.parent == Path.cwd()
     
 
-    def is_global_config(self):
+    def is_global_config(self) -> bool:
         """Check if current config is global"""
         return self.config_path and self.config_path.parent == self.get_global_config_dir()
     
 
-    def get_alias_and_provider(self, alias: str) -> tuple[str | None, str | None]:
+    def get_alias_provider_and_base_url(self, alias: str) -> tuple[str | None, str | None, str | None]:
         """Get alias, provider, and base_url for a given alias, with fallback to default."""
         default_alias_keyword = self.get("default_model_alias")
         
